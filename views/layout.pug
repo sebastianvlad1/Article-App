@@ -1,0 +1,30 @@
+doctype html
+html
+    head
+        title Node.js Article
+        link(rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.css')
+        link(rel='stylesheet' href='/css/style.css')
+    body
+        nav.navbar.navbar-expand-lg.navbar-light.bg-light
+            a.navbar-brand(href='/') Articles App
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            #navbarSupportedContent.collapse.navbar-collapse
+                ul.navbar-nav.mr-auto
+                    li.nav-item
+                        a.nav-link(href='/') Home
+                        span.sr-only (current)
+                    li.nav-item
+                        a.nav-link(href='/articles/add') Add Article
+                form.form-inline.my-2.my-lg-0
+                    input.form-control.mr-sm-2(type='search', placeholder='Search', aria-label='Search')
+                    button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search
+        .container
+        block content
+        <br>
+        <hr>
+        footer
+            p Copyright &copy 2019
+    script(src='/bower_components/jquery/dist/jquery.js')
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
+    script(src='/js/main.js')
