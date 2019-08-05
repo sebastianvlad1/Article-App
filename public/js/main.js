@@ -6,7 +6,6 @@ $(document).ready(function(){
             type: 'DELETE',
             url: '/article/delete/' + id,
             success: function(res){
-                alert('Deleted article!');
                 window.location.href='/';
             },
             error: function(err){
