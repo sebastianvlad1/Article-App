@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const router = require('./routes/route');
+const routerUser = require('./routes/users');
 const bodyParser = require('body-parser');
 const Article = require('./models/article');
 const flash = require('connect-flash');
@@ -52,6 +53,7 @@ app.use( function (req, res, next){
 
 // Use app routers
 app.use(router);
+app.use(routerUser);
 
 // Turn the server on
 app.listen(port, () => {

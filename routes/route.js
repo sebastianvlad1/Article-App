@@ -47,7 +47,7 @@ router.post('/articles/add',[
         res.redirect('/');
     } catch(e) {
 
-        req.flash('danger', 'Add author pls!');
+        req.flash('danger', 'Error while creating article!');
         res.status(400).send(e);
     }
 });
