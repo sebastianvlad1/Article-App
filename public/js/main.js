@@ -9,7 +9,7 @@ $(document).ready(function(){
                 window.location.href='/';
             },
             error: function(err){
-                alert('Error: ', err);
+                window.location.href='/';
             }
         });
     });

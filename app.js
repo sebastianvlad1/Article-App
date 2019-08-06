@@ -3,9 +3,10 @@ const path = require('path');
 const router = require('./routes/route');
 const routerUser = require('./routes/users');
 const bodyParser = require('body-parser');
-const Article = require('./models/article');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
+
 require('./db/db');
 
 // Initialize App
@@ -29,7 +30,7 @@ app.use(express.static(publicPath));
 
 //Express Session Middleware
 var sess = {
-    secret: 'keyboard cat',
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {}
@@ -49,11 +50,22 @@ app.use( function (req, res, next){
     next();
 });
 
-// Express Validator Middleware
+
+// Passport config
+require('./config/passport')(passport);
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('*', (req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 // Use app routers
 app.use(router);
 app.use(routerUser);
+
 
 // Turn the server on
 app.listen(port, () => {

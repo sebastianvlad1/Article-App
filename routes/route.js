@@ -2,7 +2,17 @@ const express = require('express');
 const router = new express.Router();
 const Article = require('../models/article');
 const { check, validationResult } = require('express-validator');
+const User = require('../models/user');
 
+// Access control
+const authMiddleware = (req, res, next) => {
+    if(req.isAuthenticated()){
+        return next();
+    } else {
+        req.flash('danger', 'Please login!');
+        res.redirect('/login');
+    }
+}
 
 router.get('/', async (req, res) => {
 
@@ -18,7 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/articles/add', (req, res) => {
+router.get('/articles/add', authMiddleware,(req, res) => {
     
     res.render('add_article', {
         title: 'Add Article'
@@ -26,7 +36,7 @@ router.get('/articles/add', (req, res) => {
 });
 
 router.post('/articles/add',[
-    check('author').not().isEmpty().withMessage('Author cannot be empty!'),
+    //check('author').not().isEmpty().withMessage('Author cannot be empty!'),
     check('title').not().isEmpty().withMessage('Title cannot be empty!'),
     check('body').isLength({ min: 5 }).withMessage('Body must have at least 5 characters!')
   ], async (req, res) => {
@@ -39,7 +49,11 @@ router.post('/articles/add',[
         });
       }
 
-    const article = new Article(req.body);
+    const article = new Article({
+        title : req.body.title,
+        author : req.user._id,
+        body : req.body.body
+    });
     
     try{
         await article.save();
@@ -55,8 +69,10 @@ router.post('/articles/add',[
 router.get('/article/:id', async (req, res) => {
     try{
         const article = await Article.findById(req.params.id);
+        const user = await User.findById(article.author);
         res.render('article', {
-            article
+            article,
+            author: user.name
         });
     } catch(e) {
         res.status(400).send(e);
@@ -64,9 +80,13 @@ router.get('/article/:id', async (req, res) => {
 });
 
 // Load edit form
-router.get('/article/edit/:id', async (req, res) => {
+router.get('/article/edit/:id', authMiddleware,async (req, res) => {
     try{
         const article = await Article.findById(req.params.id);
+        if(article.author != req.user._id){
+            req.flash('danger', "You're not the author of the article!");
+            return res.redirect('/');
+        }
         res.render('edit_article', {
             title: 'Edit Title',
             article
@@ -94,15 +114,22 @@ router.post('/article/edit/:id', async (req, res) => {
 });
 
 //delete article
-router.delete('/article/delete/:id', async (req, res) => {
+router.delete('/article/delete/:id', authMiddleware, async (req, res) => {
+    
     try{
         const article = await Article.findById(req.params.id);
+        if(article.author != req.user._id){
+            req.flash('danger', 'You dont own that article in order to delete it!');
+            return res.status(400).send();
+        }
+        req.flash('danger', 'Article removed!');
         await article.remove();
         res.send();
     } catch(e) {
-        res.status(400).send(e);
+        res.status(400).send('errorbasadas');
     }
-    
 });
+
+
 
 module.exports = router;
